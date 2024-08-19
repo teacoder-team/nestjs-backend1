@@ -1,6 +1,6 @@
 {
 	"name": "teacoder-back",
-	"version": "0.1.18",
+	"version": "0.1.20",
 	"description": "This project is a backend for the Teacoder educational platform focused on teaching web development. It is developed using modern technologies to ensure high performance, scalability, and ease of use.",
 	"author": "Vadim Nechaev",
 	"private": true,

@@ -161,6 +161,8 @@ export class AuthController {
 
 		this.authService.addRefreshTokenToResponse(res, refreshToken)
 
+		console.log(response, refreshToken)
+
 		return res.redirect(
 			`${process.env['APP_ORIGIN']}/student?accessToken=${response.accessToken}`
 		)
