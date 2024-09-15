@@ -1,40 +1,25 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { JwtModule } from '@nestjs/jwt'
-import { getJwtConfig } from 'src/config/jwt.config'
-import { CourseService } from 'src/course/course.service'
-import { EmailService } from 'src/email/email.service'
-import { PrismaService } from 'src/prisma.service'
+import { MailService } from 'src/libs/mail/mail.service'
 import { UserService } from 'src/user/user.service'
+
+import { getProvidersConfig } from '@/config/providers.config'
+
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
-import { DiscordStrategy } from './strategies/discord.strategy'
-import { GithubStrategy } from './strategies/github.strategy'
-import { GoogleStrategy } from './strategies/google.strategy'
-import { JwtStrategy } from './strategies/jwt.strategy'
-import { YandexStrategy } from './strategies/yandex.strategy'
+import { AuthProviderGuard } from './guards/provider.guard'
+import { ProviderModule } from './providers/provider.module'
 
 @Module({
 	imports: [
-		ConfigModule,
-		JwtModule.registerAsync({
+		ProviderModule.registerAsync({
 			imports: [ConfigModule],
-			useFactory: getJwtConfig,
+			useFactory: getProvidersConfig,
 			inject: [ConfigService]
 		})
 	],
 	controllers: [AuthController],
-	providers: [
-		AuthService,
-		CourseService,
-		PrismaService,
-		UserService,
-		EmailService,
-		JwtStrategy,
-		GoogleStrategy,
-		GithubStrategy,
-		YandexStrategy,
-		DiscordStrategy
-	]
+	providers: [AuthService, AuthProviderGuard, UserService, MailService],
+	exports: [AuthService]
 })
 export class AuthModule {}

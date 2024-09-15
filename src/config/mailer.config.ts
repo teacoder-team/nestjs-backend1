@@ -1,20 +1,21 @@
-import { MailerOptions } from '@nestjs-modules/mailer'
+import type { MailerOptions } from '@nestjs-modules/mailer'
 import { ConfigService } from '@nestjs/config'
-import { isDev } from 'src/utils/is-dev.util'
+
+import { isDev } from '@/libs/common/utils/is-dev.util'
 
 export const getMailerConfig = async (
 	configService: ConfigService
 ): Promise<MailerOptions> => ({
 	transport: {
-		host: configService.get('SMTP_SERVER'),
-		port: isDev(configService) ? 25 : 465,
+		host: configService.getOrThrow<string>('MAIL_HOST'),
+		port: configService.getOrThrow<number>('MAIL_PORT'),
 		secure: !isDev(configService),
 		auth: {
-			user: configService.get('SMTP_LOGIN'),
-			pass: configService.get('SMTP_PASSWORD')
+			user: configService.getOrThrow<string>('MAIL_LOGIN'),
+			pass: configService.getOrThrow<string>('MAIL_PASSWORD')
 		}
 	},
 	defaults: {
-		from: '"TeaCoder" <help@teacoder.ru>'
+		from: `"TeaCoder Team" ${configService.getOrThrow<string>('MAIL_LOGIN')}`
 	}
 })

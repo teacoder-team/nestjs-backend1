@@ -1,0 +1,56 @@
+version: '3.7'
+
+# Определяем сервисы, которые будут запускаться в контейнерах
+services:
+
+  # Сервис базы данных PostgreSQL
+  db:
+    # Имя контейнера
+    container_name: postgres
+    # Образ для создания контейнера
+    image: postgres:15.2
+    # Политика перезапуска контейнера
+    restart: always
+    # Переменные окружения для настройки базы данных
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    # Порты для доступа к базе данных
+    ports:
+      - 5433:5432
+    # Подключение постоянного хранилища для данных базы данных
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Подключение к сети backend
+    networks:
+      - backend
+
+  # Сервис Redis
+  redis:
+    # Имя контейнера
+    container_name: redis
+    # Образ для создания контейнера
+    image: redis:5.0
+    # Политика перезапуска контейнера
+    restart: always
+    # Порты для доступа к Redis
+    ports:
+      - 6379:6379
+    # Команда для запуска Redis с требованием пароля
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    # Подключение постоянного хранилища для данных Redis
+    volumes:
+      - redis_data:/data
+    # Подключение к сети backend
+    networks:
+      - backend
+
+# Определяем постоянные хранилища для данных
+volumes:
+  postgres_data:
+  redis_data:
+
+# Определяем сеть для взаимодействия между контейнерами
+networks:
+  backend:

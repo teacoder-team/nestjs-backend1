@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+
 import { AuthModule } from './auth/auth.module'
 import { ChapterModule } from './chapter/chapter.module'
 import { CourseModule } from './course/course.module'
-import { EmailModule } from './email/email.module'
-import { LogCourseModule } from './log_course/log_course.module'
-import { MediaModule } from './media/media.module'
+import { IS_DEV_ENV } from './libs/common/utils/is-dev.util'
+import { MailModule } from './libs/mail/mail.module'
+import { PrismaModule } from './prisma/prisma.module'
+import { ProgressModule } from './progress/progress.module'
 import { UserModule } from './user/user.module'
-import { IS_DEV_ENV } from './utils/is-dev.util'
 
 @Module({
 	imports: [
@@ -15,13 +16,13 @@ import { IS_DEV_ENV } from './utils/is-dev.util'
 			ignoreEnvFile: !IS_DEV_ENV,
 			isGlobal: true
 		}),
+		PrismaModule,
 		AuthModule,
 		UserModule,
-		EmailModule,
+		MailModule,
 		CourseModule,
-		MediaModule,
 		ChapterModule,
-		LogCourseModule
+		ProgressModule
 	]
 })
 export class AppModule {}

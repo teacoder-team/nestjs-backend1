@@ -1,60 +1,48 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { CourseService } from 'src/course/course.service'
-import { PrismaService } from 'src/prisma.service'
+import { AuthMethod } from '@prisma/__generated__'
+import { hash } from 'argon2'
+
+import { PrismaService } from '@/prisma/prisma.service'
 
 @Injectable()
 export class UserService {
-	constructor(
-		private readonly prisma: PrismaService,
-		private readonly courseService: CourseService
-	) {}
+	public constructor(private readonly prismaService: PrismaService) {}
 
-	/**
-	 * Получает список всех пользователей из базы данных.
-	 * Пользователи сортируются по дате создания в обратном порядке.
-	 * @returns Массив объектов пользователей, включая данные профиля.
-	 */
-	async findList() {
-		const users = await this.prisma.user.findMany({
+	public async findList() {
+		const users = await this.prismaService.user.findMany({
 			orderBy: {
 				createdAt: 'desc'
 			},
 			include: {
-				profile: true
+				accounts: true
 			}
 		})
 
 		return users
 	}
 
-	/**
-	 * Получает 10 самых продуктивных пользователей по количеству очков (points).
-	 * @returns Массив объектов пользователей, включая данные профиля.
-	 */
-	async findTopUsersByPoints() {
-		const topUsers = await this.prisma.user.findMany({
+	public async findTopUsersByPoints() {
+		const topUsers = await this.prismaService.user.findMany({
 			select: {
 				id: true,
-				profile: { select: { name: true, picture: true, points: true } }
+				displayName: true,
+				picture: true,
+				points: true
 			},
-			orderBy: { profile: { points: 'desc' } },
+			orderBy: { points: 'desc' },
 			take: 10
 		})
 
 		return topUsers
 	}
 
-	/**
-	 * Находит пользователя по его уникальному идентификатору (id).
-	 * @param id - Уникальный идентификатор пользователя
-	 * @returns Объект пользователя
-	 * @throws NotFoundException - Если пользователь не найден
-	 */
-	async findById(id: number) {
-		const user = await this.prisma.user.findUnique({
-			where: { id },
+	public async findById(id: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				id
+			},
 			include: {
-				profile: true
+				accounts: true
 			}
 		})
 
@@ -63,66 +51,37 @@ export class UserService {
 		return user
 	}
 
-	/**
-	 * Находит пользователя по его email.
-	 * @param email - Электронная почта пользователя
-	 * @returns Объект пользователя
-	 */
-	async findByEmail(email: string) {
-		return this.prisma.user.findUnique({
-			where: { email }
-		})
-	}
-
-	async findProgress(userId: number, courseId: number) {
-		await this.courseService.findById(courseId)
-
-		const publishedChapters = await this.prisma.chapter.findMany({
+	public async findByEmail(email: string) {
+		const user = await this.prismaService.user.findUnique({
 			where: {
-				courseId,
-				isPublished: true
-			},
-			orderBy: { position: 'asc' }
-		})
-
-		const publishedChapterIds = publishedChapters.map(chapter => chapter.id)
-
-		if (publishedChapterIds.length === 0) return 0
-
-		const validCompletedChapters = await this.prisma.logCourse.count({
-			where: {
-				userId,
-				chapterId: { in: publishedChapterIds },
-				isCompleted: true
+				email
 			}
 		})
 
-		const progressPercentage =
-			(validCompletedChapters / publishedChapterIds.length) * 100
-
-		return progressPercentage
+		return user
 	}
 
-	/**
-	 * Создает нового пользователя и связанный профиль в базе данных.
-	 * @param user - Данные нового пользователя
-	 * @returns Объект созданного пользователя
-	 */
-	async create(user: any) {
-		return this.prisma.user.create({
+	public async create(
+		email: string,
+		password: string,
+		displayName: string,
+		picture: string,
+		method: AuthMethod
+	) {
+		const user = await this.prismaService.user.create({
 			data: {
-				email: user.email,
-				profile: {
-					create: {
-						name: user.name,
-						picture: user.picture,
-						provider: user.type
-					}
-				}
+				email,
+				password: password ? await hash(password) : null,
+				displayName,
+				username: 'username',
+				picture,
+				method
 			},
 			include: {
-				profile: true
+				accounts: true
 			}
 		})
+
+		return user
 	}
 }

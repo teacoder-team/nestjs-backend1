@@ -1,86 +1,32 @@
-import { Controller, Get, Param } from '@nestjs/common'
-import {
-	ApiNotFoundResponse,
-	ApiOkResponse,
-	ApiOperation,
-	ApiTags,
-	ApiUnauthorizedResponse
-} from '@nestjs/swagger'
-import { UserRole } from '@prisma/client'
-import { Auth } from 'src/auth/decorators/auth.decorator'
-import { CurrentUser } from 'src/auth/decorators/user.decorator'
-import { UserEntity } from './entities/user.entitiy'
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common'
+import { UserRole } from '@prisma/__generated__'
+
+import { Authorization } from '@/auth/decorators/auth.decorator'
+import { Authorized } from '@/auth/decorators/authorized.decorator'
+
 import { UserService } from './user.service'
 
-@ApiTags('Users')
 @Controller('users')
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	public constructor(private readonly userService: UserService) {}
 
-	/**
-	 * Получает список всех пользователей.
-	 * Доступно только для пользователей с ролью ADMIN.
-	 * @returns Массив объектов пользователей, включая данные профиля.
-	 */
-	@ApiOperation({ summary: 'Get all users' })
-	@ApiOkResponse({
-		description:
-			'Successful response containing a list of all users with their profile data.',
-		type: [UserEntity]
-	})
-	@ApiUnauthorizedResponse({
-		description: 'Unauthorized access. This endpoint requires ADMIN role.'
-	})
-	@Auth(UserRole.ADMIN)
+	@Authorization(UserRole.ADMIN)
 	@Get()
-	async findAll() {
+	@HttpCode(HttpStatus.OK)
+	public async findAll() {
 		return this.userService.findList()
 	}
 
-	/**
-	 * Получает 10 самых продуктивных пользователей по количеству очков (points).
-	 * @returns Массив объектов пользователей, включая данные профиля.
-	 */
-	@ApiOperation({ summary: 'Get top 10 users by points' })
-	@ApiOkResponse({
-		description:
-			'Successful response containing the top 10 users sorted by points.',
-		type: [UserEntity]
-	})
 	@Get('find-top')
-	async findTopUsers() {
+	@HttpCode(HttpStatus.OK)
+	public async findTopUsers() {
 		return this.userService.findTopUsersByPoints()
 	}
 
-	/**
-	 * Получает профиль текущего пользователя.
-	 * @param id - Уникальный идентификатор текущего пользователя, полученный из токена
-	 * @returns Объект профиля пользователя
-	 */
-	@ApiOperation({ summary: 'Get user profile' })
-	@ApiOkResponse({
-		description:
-			'Successful response containing the profile information of the authenticated user.',
-		type: UserEntity
-	})
-	@ApiUnauthorizedResponse({
-		description: 'Unauthorized access. This endpoint requires authentication.'
-	})
-	@ApiNotFoundResponse({
-		description: 'User not found with the provided ID.'
-	})
-	@Auth()
+	@Authorization()
 	@Get('profile')
-	async findById(@CurrentUser('id') id: number) {
+	@HttpCode(HttpStatus.OK)
+	public async findById(@Authorized('id') id: string) {
 		return this.userService.findById(id)
-	}
-
-	@Auth()
-	@Get('progress/:courseId')
-	async findProgress(
-		@CurrentUser('id') userId: string,
-		@Param('courseId') courseId: string
-	) {
-		return this.userService.findProgress(+userId, +courseId)
 	}
 }

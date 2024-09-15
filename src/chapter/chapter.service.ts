@@ -1,29 +1,34 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { CourseService } from 'src/course/course.service'
-import { PrismaService } from 'src/prisma.service'
-import { generateSlug } from 'src/utils/generate-slug.util'
 import { v4 as uuidv4 } from 'uuid'
+
+import { generateSlug } from '@/libs/common/utils/generate-slug.util'
+import { PrismaService } from '@/prisma/prisma.service'
+
 import { CreateChapterDto } from './dto/create-chapter.dto'
-import { UpdateChapterDto } from './dto/update-chapter.dto'
 
 @Injectable()
 export class ChapterService {
-	constructor(
-		private readonly prisma: PrismaService,
+	public constructor(
+		private readonly prismaService: PrismaService,
 		private readonly courseService: CourseService
 	) {}
 
-	async findList() {
-		const chapters = await this.prisma.chapter.findMany({
-			where: { isPublished: true },
-			orderBy: { createdAt: 'desc' }
+	public async findList() {
+		const chapters = await this.prismaService.chapter.findMany({
+			where: {
+				isPublished: true
+			},
+			orderBy: {
+				createdAt: 'desc'
+			}
 		})
 
 		return chapters
 	}
 
-	async findBySlug(slug: string, userId: number) {
-		const chapter = await this.prisma.chapter.findUnique({
+	public async findBySlug(slug: string, userId: string) {
+		const chapter = await this.prismaService.chapter.findUnique({
 			where: { slug, isPublished: true },
 			include: {
 				course: {
@@ -37,16 +42,9 @@ export class ChapterService {
 			}
 		})
 
-		// const userProgerss = await db.query.logCourses.findFirst({
-		// 	where: and(
-		// 		eq(logCourses.userId, userId),
-		// 		eq(logCourses.chapterId, chapter.id)
-		// 	)
-		// })
-
 		if (!chapter) throw new NotFoundException('Глава не найдена')
 
-		const userProgress = await this.prisma.logCourse.findFirst({
+		const userProgress = await this.prismaService.userProgress.findFirst({
 			where: {
 				userId,
 				chapterId: chapter.id
@@ -56,15 +54,11 @@ export class ChapterService {
 		return { chapter, userProgress }
 	}
 
-	/**
-	 * Находит главу по её идентификатору.
-	 * @param id - Уникальный идентификатор главы.
-	 * @returns Объект главы с указанным идентификатором.
-	 * @throws NotFoundException - Если глава с указанным идентификатором не найдена.
-	 */
-	async findById(id: number) {
-		const chapter = await this.prisma.chapter.findUnique({
-			where: { id }
+	public async findById(id: string) {
+		const chapter = await this.prismaService.chapter.findUnique({
+			where: {
+				id
+			}
 		})
 
 		if (!chapter) throw new NotFoundException('Глава не найдена')
@@ -72,23 +66,19 @@ export class ChapterService {
 		return chapter
 	}
 
-	/**
-	 * Создает новую главу для указанного курса.
-	 * @param dto - Объект данных для создания новой главы.
-	 * @param courseId - Уникальный идентификатор курса, к которому относится глава.
-	 * @returns Объект с идентификатором созданной главы.
-	 */
-	async create(dto: CreateChapterDto, courseId: number) {
+	public async create(dto: CreateChapterDto, courseId: string) {
 		await this.courseService.findById(courseId)
 
-		const lastChapter = await this.prisma.chapter.findFirst({
-			where: { courseId },
+		const lastChapter = await this.prismaService.chapter.findFirst({
+			where: {
+				courseId
+			},
 			orderBy: { position: 'desc' }
 		})
 
 		const newPosition = lastChapter ? lastChapter.position + 1 : 1
 
-		const chapter = await this.prisma.chapter.create({
+		const chapter = await this.prismaService.chapter.create({
 			data: {
 				name: dto.name,
 				slug: this.generateSlugWithUniqueSuffix(dto.name),
@@ -100,48 +90,6 @@ export class ChapterService {
 		return { id: chapter.id }
 	}
 
-	/**
-	 * Обновляет существующую главу.
-	 * @param id - Уникальный идентификатор главы, которую нужно обновить.
-	 * @param dto - Объект данных для обновления главы.
-	 * @returns Обновленный объект главы.
-	 * @throws NotFoundException - Если глава с указанным идентификатором не найдена.
-	 */
-	async update(id: number, dto: UpdateChapterDto) {
-		await this.findById(id)
-
-		const chapter = await this.prisma.chapter.update({
-			where: { id },
-			data: {
-				...dto,
-				slug: this.generateSlugWithUniqueSuffix(dto.name)
-			}
-		})
-
-		return chapter
-	}
-
-	/**
-	 * Удаляет главу по её идентификатору.
-	 * @param id - Уникальный идентификатор главы, которую нужно удалить.
-	 * @returns Объект с идентификатором удаленной главы.
-	 * @throws NotFoundException - Если глава с указанным идентификатором не найдена.
-	 */
-	async delete(id: number) {
-		await this.findById(id)
-
-		const chapter = await this.prisma.chapter.delete({
-			where: { id }
-		})
-
-		return { id: chapter.id }
-	}
-
-	/**
-	 * Генерирует уникальный slug для главы с добавлением суффикса.
-	 * @param name - Имя главы, на основе которого будет сгенерирован slug.
-	 * @returns Уникальный slug для главы.
-	 */
 	private generateSlugWithUniqueSuffix(name: string) {
 		const slug = generateSlug(name)
 		const uniqueSuffix = uuidv4().split('-')[0]
