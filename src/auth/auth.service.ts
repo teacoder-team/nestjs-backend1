@@ -111,7 +111,7 @@ export class AuthService {
 			})
 		}
 
-		await this.mailService.sendWelcomeEmail(user.email, user.displayName)
+		// await this.mailService.sendWelcomeEmail(user.email, user.displayName)
 
 		return this.saveSession(req, user)
 	}
