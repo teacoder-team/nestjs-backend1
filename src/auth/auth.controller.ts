@@ -55,12 +55,11 @@ export class AuthController {
 			throw new BadRequestException('Не был предоставлен код авторизации')
 		}
 
-		return this.authService.extractProfileFromCode(req, provider, code)
-		// await this.authService.extractProfileFromCode(req, provider, code)
+		await this.authService.extractProfileFromCode(req, provider, code)
 
-		// return res.redirect(
-		// 	this.configService.getOrThrow<string>('ALLOWED_ORIGIN') + '/account'
-		// )
+		return res.redirect(
+			this.configService.getOrThrow<string>('ALLOWED_ORIGIN') + '/account'
+		)
 	}
 
 	@UseGuards(AuthProviderGuard)

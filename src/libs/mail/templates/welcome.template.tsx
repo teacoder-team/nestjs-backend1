@@ -11,15 +11,14 @@ import { Html } from '@react-email/html'
 import * as React from 'react'
 
 interface WelcomeTemplateProps {
-	url: string
 	username: string
 }
 
-export function WelcomeTemplate({ url, username }: WelcomeTemplateProps) {
+export function WelcomeTemplate({ username }: WelcomeTemplateProps) {
 	return (
 		<Tailwind>
 			<Html>
-				<Body className='font-sans p-10 px-20 text-base text-black'>
+				<Body className='font-sans text-base text-black'>
 					<Heading className='text-2xl font-bold'>
 						Здравствуйте, {username}! 👋
 					</Heading>
@@ -48,7 +47,7 @@ export function WelcomeTemplate({ url, username }: WelcomeTemplateProps) {
 							сосредоточенным на ваших целях. 💪
 						</Text>
 						<Img
-							src={`${url}/uploads/email/email-1.png`}
+							src='https://teacoder.ru/uploads/email/543d96d9-email-1.png'
 							width='28%'
 							className='rounded-lg mt-4'
 						/>
@@ -65,7 +64,7 @@ export function WelcomeTemplate({ url, username }: WelcomeTemplateProps) {
 							Соревнуйтесь с другими и стремитесь занять одно из первых мест! 🎯
 						</Text>
 						<Img
-							src={`${url}/uploads/email/email-2.png`}
+							src='https://teacoder.ru/uploads/email/007b0adb-email-2.png'
 							width='32%'
 							className='rounded-lg mt-4'
 						/>
@@ -83,6 +82,11 @@ export function WelcomeTemplate({ url, username }: WelcomeTemplateProps) {
 							Перейти на TeaCoder
 						</Link>
 					</div>
+					<Hr className='my-4' />
+					<Text className='mt-2'>
+						C уважением,<br />
+						TeaCoder Team 👩‍💻👨‍💻
+					</Text>
 				</Body>
 			</Html>
 		</Tailwind>

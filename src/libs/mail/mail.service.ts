@@ -21,8 +21,7 @@ export class MailService {
 	 * @returns Promise, которое разрешается после завершения отправки приветственного письма.
 	 */
 	public async sendWelcomeEmail(email: string, username: string) {
-		const url = this.configService.getOrThrow<string>('ALLOWED_ORIGIN')
-		const html = render(WelcomeTemplate({ url, username }))
+		const html = render(WelcomeTemplate({ username }))
 
 		return this.sendMail(email, 'Успешная регистрация', html)
 	}

@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common'
+import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common'
 import { UserRole } from '@prisma/__generated__'
 
 import { Authorization } from '@/auth/decorators/auth.decorator'
@@ -28,5 +28,22 @@ export class UserController {
 	@HttpCode(HttpStatus.OK)
 	public async findById(@Authorized('id') id: string) {
 		return this.userService.findById(id)
+	}
+
+	@Authorization()
+	@Get('progress/:courseId')
+	@HttpCode(HttpStatus.OK)
+	public async findUserProgress(
+		@Authorized('id') userId: string,
+		@Param('courseId') courseId: string
+	) {
+		return this.userService.findUserProgress(userId, courseId)
+	}
+
+	@Authorization()
+	@Get('course-by-progress')
+	@HttpCode(HttpStatus.OK)
+	public async findCourseByProgress(@Authorized('id') userId: string) {
+		return this.userService.findCourseByProgress(userId)
 	}
 }

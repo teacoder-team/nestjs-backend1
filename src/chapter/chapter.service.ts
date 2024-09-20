@@ -29,13 +29,27 @@ export class ChapterService {
 
 	public async findBySlug(slug: string, userId: string) {
 		const chapter = await this.prismaService.chapter.findUnique({
-			where: { slug, isPublished: true },
+			where: {
+				slug,
+				isPublished: true
+			},
 			include: {
 				course: {
 					include: {
 						chapters: {
-							where: { isPublished: true },
-							orderBy: { position: 'asc' }
+							where: {
+								isPublished: true
+							},
+							include: {
+								userProgress: {
+									where: {
+										userId
+									}
+								}
+							},
+							orderBy: {
+								position: 'asc'
+							}
 						}
 					}
 				}

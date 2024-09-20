@@ -25,7 +25,7 @@ export class PasswordRecoveryService {
 		const existingUser = await this.userService.findByEmail(dto.email)
 
 		if (!existingUser) {
-			throw new NotFoundException('Пользователь не найден.')
+			throw new NotFoundException('Пользователь не найден')
 		}
 
 		const passwordResetToken = await this.generatePasswordResetToken(

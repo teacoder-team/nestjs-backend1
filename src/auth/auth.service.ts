@@ -32,9 +32,7 @@ export class AuthService {
 		const isExists = await this.userService.findByEmail(dto.email)
 
 		if (isExists) {
-			throw new ConflictException(
-				'Пользователь с таким email уже существует'
-			)
+			throw new ConflictException('Пользователь уже существует')
 		}
 
 		const newUser = await this.userService.create(
@@ -112,6 +110,8 @@ export class AuthService {
 				}
 			})
 		}
+
+		await this.mailService.sendWelcomeEmail(user.email, user.displayName)
 
 		return this.saveSession(req, user)
 	}
