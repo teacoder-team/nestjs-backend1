@@ -84,9 +84,21 @@ export class AuthService {
 
 		let user = account?.userId
 			? await this.userService.findById(account?.userId)
-			: null
+			: await this.userService.findByEmail(profile.email)
 
 		if (user) {
+			if (!account) {
+				await this.prismaService.account.create({
+					data: {
+						userId: user.id,
+						type: 'oauth',
+						provider: profile.provider,
+						refreshToken: profile.refresh_token,
+						accessToken: profile.access_token,
+						expiresAt: profile.expires_at
+					}
+				})
+			}
 			return this.saveSession(req, user)
 		}
 
@@ -98,20 +110,16 @@ export class AuthService {
 			AuthMethod[profile.provider.toUpperCase()]
 		)
 
-		if (!account) {
-			await this.prismaService.account.create({
-				data: {
-					userId: user.id,
-					type: 'oauth',
-					provider: profile.provider,
-					refreshToken: profile.refresh_token,
-					accessToken: profile.access_token,
-					expiresAt: profile.expires_at
-				}
-			})
-		}
-
-		// await this.mailService.sendWelcomeEmail(user.email, user.displayName)
+		await this.prismaService.account.create({
+			data: {
+				userId: user.id,
+				type: 'oauth',
+				provider: profile.provider,
+				refreshToken: profile.refresh_token,
+				accessToken: profile.access_token,
+				expiresAt: profile.expires_at
+			}
+		})
 
 		return this.saveSession(req, user)
 	}
