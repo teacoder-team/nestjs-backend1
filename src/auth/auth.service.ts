@@ -43,10 +43,10 @@ export class AuthService {
 			AuthMethod.CREDENTIALS
 		)
 
-		// await this.mailService.sendWelcomeEmail(
-		// 	newUser.email,
-		// 	newUser.displayName
-		// )
+		await this.mailService.sendWelcomeEmail(
+			newUser.email,
+			newUser.displayName
+		)
 
 		return this.saveSession(req, newUser)
 	}
