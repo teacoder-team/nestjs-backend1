@@ -14,7 +14,7 @@ import { MediaService } from './media.service'
 			serveRoot: '/uploads'
 		})
 	],
-	controllers: [MediaController, UserService],
-	providers: [MediaService]
+	controllers: [MediaController],
+	providers: [MediaService, UserService]
 })
 export class MediaModule {}
