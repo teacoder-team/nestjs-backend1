@@ -10,6 +10,9 @@ WORKDIR /app
 # Копируем файлы зависимостей в рабочую директорию
 COPY package.json yarn.lock ./
 
+# Устанавливаем кэш для Yarn
+ENV YARN_CACHE_FOLDER=/tmp/.yarn-cache
+
 # Устанавливаем зависимости проекта
 RUN yarn install
 
