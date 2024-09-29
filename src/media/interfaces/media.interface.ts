@@ -1,8 +1,8 @@
-export interface IMediaResponse {
+export interface MediaResponse {
 	url: string
 	name: string
 }
 
-export interface IFile extends Express.Multer.File {
+export interface File extends Express.Multer.File {
 	name?: string
 }
