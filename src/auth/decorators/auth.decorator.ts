@@ -1,14 +1,18 @@
 import { applyDecorators, UseGuards } from '@nestjs/common'
-import { UserRole } from '@prisma/client'
-import { OnlyAdminGuard } from '../guards/admin.guard'
-import { JwtAuthGuard } from '../guards/jwt-auth.guard'
-import { OnlyModeratorGuard } from '../guards/moderator.guard'
+import type { UserRole } from '@prisma/__generated__'
 
-export const Auth = (role: UserRole = 'STUDENT') =>
-	applyDecorators(
-		role === UserRole.ADMIN
-			? UseGuards(JwtAuthGuard, OnlyAdminGuard)
-			: role === UserRole.MODERATOR
-				? UseGuards(JwtAuthGuard, OnlyModeratorGuard)
-				: UseGuards(JwtAuthGuard)
-	)
+import { AuthGuard } from '../guards/auth.guard'
+import { RolesGuard } from '../guards/roles.guard'
+
+import { Roles } from './roles.decorator'
+
+export function Authorization(...roles: UserRole[]) {
+	if (roles.length > 0) {
+		return applyDecorators(
+			Roles(...roles),
+			UseGuards(AuthGuard, RolesGuard)
+		)
+	}
+
+	return applyDecorators(UseGuards(AuthGuard))
+}
