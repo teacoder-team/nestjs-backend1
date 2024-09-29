@@ -13,6 +13,7 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { UserService } from 'src/user/user.service'
 
 import { MailService } from '@/libs/mail/mail.service'
+import { TelegramService } from '@/libs/telegram/telegram.service'
 
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
@@ -25,6 +26,7 @@ export class AuthService {
 		private readonly configService: ConfigService,
 		private readonly userService: UserService,
 		private readonly mailService: MailService,
+		private readonly telegramService: TelegramService,
 		private readonly providerService: ProviderService
 	) {}
 
@@ -47,6 +49,10 @@ export class AuthService {
 			newUser.email,
 			newUser.displayName
 		)
+
+		const count = await this.prismaService.user.count()
+
+		await this.telegramService.sendNewUserMessage(newUser, count)
 
 		return this.saveSession(req, newUser)
 	}

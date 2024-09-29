@@ -7,6 +7,7 @@ import { ChapterModule } from './chapter/chapter.module'
 import { CourseModule } from './course/course.module'
 import { IS_DEV_ENV } from './libs/common/utils/is-dev.util'
 import { MailModule } from './libs/mail/mail.module'
+import { TelegramModule } from './libs/telegram/telegram.module'
 import { YoutubeModule } from './libs/youtube/youtube.module'
 import { MediaModule } from './media/media.module'
 import { PrismaModule } from './prisma/prisma.module'
@@ -28,7 +29,8 @@ import { UserModule } from './user/user.module'
 		ChapterModule,
 		ProgressModule,
 		YoutubeModule,
-		MediaModule
+		MediaModule,
+		TelegramModule
 	]
 })
 export class AppModule {}

@@ -4,6 +4,7 @@ import { MailService } from 'src/libs/mail/mail.service'
 import { UserService } from 'src/user/user.service'
 
 import { getProvidersConfig } from '@/config/providers.config'
+import { TelegramService } from '@/libs/telegram/telegram.service'
 
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
@@ -19,7 +20,13 @@ import { ProviderModule } from './providers/provider.module'
 		})
 	],
 	controllers: [AuthController],
-	providers: [AuthService, AuthProviderGuard, UserService, MailService],
+	providers: [
+		AuthService,
+		AuthProviderGuard,
+		UserService,
+		MailService,
+		TelegramService
+	],
 	exports: [AuthService]
 })
 export class AuthModule {}
