@@ -1,48 +1,36 @@
-# Используем официальный образ Node.js версии 20.12.0 в качестве базового
-FROM node:20.12.0 AS base
+# Используем официальный образ Node.js в качестве базового образа
+FROM node:18 AS builder
 
-# Этап сборки приложения
-FROM base AS builder
-
-# Устанавливаем рабочую директорию для сборки
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем файлы зависимостей в рабочую директорию
+# Копируем package.json и yarn.lock для установки зависимостей
 COPY package.json yarn.lock ./
 
-# Устанавливаем кэш для Yarn
-ENV YARN_CACHE_FOLDER=/tmp/.yarn-cache
-
-# Устанавливаем зависимости проекта
+# Устанавливаем зависимости
 RUN yarn install
 
-# Копируем остальные файлы приложения в рабочую директорию
+# Копируем все файлы приложения в рабочую директорию
 COPY . .
 
-# Генерируем Prisma клиент
 RUN yarn prisma generate
-
-# Собираем приложение
+# Собираем проект для production
 RUN yarn build
 
-# Этап запуска приложения
-FROM base AS runner
+# Используем более легкий образ для production
+FROM node:18-slim
 
-# Устанавливаем рабочую директорию для запуска
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Устанавливаем переменную окружения для режима работы приложения
-ENV NODE_ENV=production
-
-# Копируем файлы зависимостей для продакшн-режима
-COPY --chown=nodejs:nodejs package.json yarn.lock ./
-
-# Устанавливаем только продакшн-зависимости
-RUN yarn install --production
-
-# Копируем собранные файлы из этапа сборки
-COPY --chown=nodejs:nodejs --from=builder /app/dist ./dist
+# Копируем только необходимые файлы из предыдущего этапа сборки
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json /app/yarn.lock ./
 COPY --chown=nodejs:nodejs --from=builder /app/prisma/__generated__ ./prisma/__generated__
 
-# Команда для запуска приложения
+# Установка продакшн зависимостей с помощью yarn
+RUN yarn install --production
+
+# Запускаем приложение
 CMD ["node", "dist/main"]
