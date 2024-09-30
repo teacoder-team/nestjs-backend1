@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { AuthMethod, type User } from '@prisma/__generated__'
 import { verify } from 'argon2'
-import type { Request, Response } from 'express'
+import type { Request } from 'express'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { UserService } from 'src/user/user.service'
 
@@ -130,7 +130,7 @@ export class AuthService {
 		return this.saveSession(req, user)
 	}
 
-	public async logout(req: Request, res: Response): Promise<void> {
+	public async logout(req: Request): Promise<void> {
 		return new Promise((resolve, reject) => {
 			req.session.destroy(err => {
 				if (err) {
@@ -140,7 +140,7 @@ export class AuthService {
 						)
 					)
 				}
-				res.clearCookie(
+				req.res.clearCookie(
 					this.configService.getOrThrow<string>('SESSION_NAME')
 				)
 				resolve()
