@@ -1,0 +1,327 @@
+openapi: 3.0.0
+paths:
+  /auth/register:
+    post:
+      operationId: AuthController_register
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDto"
+      responses:
+        "200":
+          description: ""
+  /auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+      responses:
+        "200":
+          description: ""
+  "/auth/oauth/callback/{provider}":
+    get:
+      operationId: AuthController_callback
+      parameters:
+        - name: code
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: provider
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/auth/oauth/connect/{provider}":
+    get:
+      operationId: AuthController_connect
+      parameters:
+        - name: provider
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /auth/logout:
+    post:
+      operationId: AuthController_logout
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /auth/password-recovery/reset:
+    post:
+      operationId: PasswordRecoveryController_reset
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordDto"
+      responses:
+        "200":
+          description: ""
+  "/auth/password-recovery/new/{token}":
+    post:
+      operationId: PasswordRecoveryController_new
+      parameters:
+        - name: token
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewPasswordDto"
+      responses:
+        "200":
+          description: ""
+  /users:
+    get:
+      operationId: UserController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /users/find-top:
+    get:
+      operationId: UserController_findTopUsers
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /users/profile:
+    get:
+      operationId: UserController_findById
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  "/users/progress/{courseId}":
+    get:
+      operationId: UserController_findUserProgress
+      parameters:
+        - name: courseId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /users/course-by-progress:
+    get:
+      operationId: UserController_findCourseByProgress
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /courses:
+    get:
+      operationId: CourseController_findAll
+      parameters:
+        - name: searchTerm
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    post:
+      operationId: CourseController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseDto"
+      responses:
+        "200":
+          description: ""
+  "/courses/by-slug/{slug}":
+    get:
+      operationId: CourseController_findBySlug
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/courses/by-id/{id}":
+    get:
+      operationId: CourseController_findById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /chapters:
+    get:
+      operationId: ChapterController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  "/chapters/by-slug/{slug}":
+    get:
+      operationId: ChapterController_findBySlug
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/chapters/by-id/{id}":
+    get:
+      operationId: ChapterController_findById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/chapters/{courseId}":
+    post:
+      operationId: ChapterController_create
+      parameters:
+        - name: courseId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateChapterDto"
+      responses:
+        "200":
+          description: ""
+  "/progress/{chapterId}":
+    put:
+      operationId: ProgressController_newProgress
+      parameters:
+        - name: chapterId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewProgressDto"
+      responses:
+        "200":
+          description: ""
+  "/youtube/{channel}":
+    get:
+      operationId: YoutubeController_parseLastVideo
+      parameters:
+        - name: channel
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /media:
+    post:
+      operationId: MediaController_uploadMediaFile
+      parameters:
+        - name: folder
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /swagger/json:
+    get:
+      operationId: SwaggerController_getJson
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        &a1
+        - Swagger
+  /swagger/typescript:
+    get:
+      operationId: SwaggerController_getTypescript
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+info:
+  title: TeaCoder API
+  description: This project is a backend for the Teacoder educational platform
+    focused on teaching web development. It is developed using modern
+    technologies to ensure high performance, scalability, and ease of use.
+  version: 1.0.0
+  contact:
+    name: TeaCoder Team
+    url: https://teacoder.ru
+    email: help@teacoder.ru
+tags: []
+servers: []
+components:
+  schemas:
+    RegisterDto:
+      type: object
+      properties: {}
+    LoginDto:
+      type: object
+      properties: {}
+    ResetPasswordDto:
+      type: object
+      properties: {}
+    NewPasswordDto:
+      type: object
+      properties: {}
+    CreateCourseDto:
+      type: object
+      properties: {}
+    CreateChapterDto:
+      type: object
+      properties: {}
+    NewProgressDto:
+      type: object
+      properties: {}

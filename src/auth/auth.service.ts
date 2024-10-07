@@ -52,7 +52,7 @@ export class AuthService {
 
 		const count = await this.prismaService.user.count()
 
-		await this.telegramService.sendNewUserMessage(newUser, count)
+		// await this.telegramService.sendNewUserMessage(newUser, count)
 
 		return this.saveSession(req, newUser)
 	}
