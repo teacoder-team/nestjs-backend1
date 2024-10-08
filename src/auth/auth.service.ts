@@ -45,14 +45,14 @@ export class AuthService {
 			AuthMethod.CREDENTIALS
 		)
 
-		await this.mailService.sendWelcomeEmail(
-			newUser.email,
-			newUser.displayName
-		)
+		// await this.mailService.sendWelcomeEmail(
+		// 	newUser.email,
+		// 	newUser.displayName
+		// )
 
 		const count = await this.prismaService.user.count()
 
-		// await this.telegramService.sendNewUserMessage(newUser, count)
+		await this.telegramService.sendNewUserMessage(newUser, count)
 
 		return this.saveSession(req, newUser)
 	}
